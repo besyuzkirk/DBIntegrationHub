@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    /* FawnStudios Design - Professional & Modern */
+    --background: 220 18% 97%;          /* Soft blue-gray background */
+    --foreground: 222 47% 11%;          /* Deep slate text */
+
+    --card: 0 0% 100%;                  /* Pure white cards */
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 217 91% 60%;             /* Modern vibrant blue */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;           /* Light slate */
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 220 14% 96%;               /* Soft slate muted */
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 210 40% 96%;              /* Light blue accent */
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84% 60%;           /* Vibrant red */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;              /* Subtle cool border */
+    --input: 220 13% 91%;
+    --ring: 217 91% 60%;
+
+    /* Chart colors - modern and vibrant */
+    --chart-1: 217 91% 60%;
+    --chart-2: 142 76% 36%;
+    --chart-3: 262 83% 58%;
+    --chart-4: 346 77% 50%;
+    --chart-5: 47 96% 53%;
+
+    /* FawnStudios Brand Colors */
+    --fawn-sage: 210 40% 96%;
+    --fawn-sand: 220 14% 96%;
+    --fawn-stone: 220 13% 91%;
+    --fawn-warm: 220 18% 97%;
+
+    /* Border radius - generous and rounded */
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 15%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 15%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 223 47% 11%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 217 91% 60%;
+
+    --chart-1: 217 91% 60%;
+    --chart-2: 142 76% 36%;
+    --chart-3: 262 83% 58%;
+    --chart-4: 346 77% 50%;
+    --chart-5: 47 96% 53%;
+
+    --fawn-sage: 216 34% 17%;
+    --fawn-sand: 217 33% 17%;
+    --fawn-stone: 217 33% 17%;
+    --fawn-warm: 222 47% 11%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border transition-colors duration-300;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Beautiful focus rings */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary/40 ring-offset-2 ring-offset-background;
+  }
+}
+
+/* FawnStudios utility classes */
+@layer components {
+  .fawn-card {
+    @apply bg-card rounded-xl shadow-sm hover:shadow-md transition-all duration-400;
+  }
+  
+  .fawn-button {
+    @apply rounded-xl transition-all duration-400 hover:scale-[1.02] active:scale-[0.98];
+  }
+  
+  .fawn-input {
+    @apply rounded-xl border-2 transition-all duration-300 focus:border-primary/50;
+  }
+  
+  .fawn-container {
+    @apply max-w-7xl mx-auto px-6 sm:px-8 lg:px-12;
+  }
+  
+  /* Legacy zen class support */
+  .zen-card { @apply fawn-card; }
+  .zen-button { @apply fawn-button; }
+  .zen-input { @apply fawn-input; }
+  .zen-container { @apply fawn-container; }
+}
+
+/* React Toastify Custom Styles */
+.Toastify__progress-bar {
+  background: hsl(217, 91%, 60%) !important;
+}
+
+.Toastify__progress-bar--success {
+  background: hsl(142, 76%, 36%) !important;
+}
+
+.Toastify__progress-bar--error {
+  background: hsl(0, 84%, 60%) !important;
+}
+
+.Toastify__progress-bar--info {
+  background: hsl(217, 91%, 60%) !important;
+}
+
+.Toastify__progress-bar--warning {
+  background: hsl(47, 96%, 53%) !important;
+}
