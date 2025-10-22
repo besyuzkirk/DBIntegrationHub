@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Veritabanı
+  postgres:
+    image: postgres:16-alpine
+    container_name: dbintegrationhub-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: DBIntegrationHub
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - dbintegrationhub-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # .NET API
+  api:
+    build:
+      context: ../DBIntegrationHub.API
+      dockerfile: ../devops/Dockerfile.api
+    container_name: dbintegrationhub-api
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=DBIntegrationHub;Username=postgres;Password=postgres
+      - Jwt__Key=ProductionSecretKeyForDBIntegrationHub2024!MinimumLength32Characters!ChangeInProduction!
+      - Jwt__Issuer=DBIntegrationHub
+      - Jwt__Audience=DBIntegrationHub
+      - Jwt__ExpiryMinutes=1440
+    ports:
+      - "5149:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dbintegrationhub-network
+    volumes:
+      - api_logs:/app/logs
+
+  # Next.js UI
+  ui:
+    build:
+      context: ../sql-integration-hub-ui
+      dockerfile: ../devops/Dockerfile.ui
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:5149/api
+    container_name: dbintegrationhub-ui
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:5149/api
+    ports:
+      - "3005:3000"
+    depends_on:
+      - api
+    networks:
+      - dbintegrationhub-network
+
+networks:
+  dbintegrationhub-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  api_logs:
+    driver: local
+

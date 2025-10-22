@@ -1,0 +1,35 @@
+# Nginx Reverse Proxy ile Production Deployment
+# Kullanım: docker-compose -f docker-compose.yml -f docker-compose.nginx.yml up
+
+version: '3.8'
+
+services:
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: dbintegrationhub-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+      - ui
+    networks:
+      - dbintegrationhub-network
+
+  # API - port'u kapatıyoruz, sadece nginx üzerinden erişilebilir
+  api:
+    ports: []
+    expose:
+      - "80"
+
+  # UI - port'u kapatıyoruz, sadece nginx üzerinden erişilebilir
+  ui:
+    ports: []
+    expose:
+      - "3000"
+

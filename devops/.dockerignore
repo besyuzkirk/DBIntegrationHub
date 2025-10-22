@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# DevOps
+devops/
+*.md
+README.md
+QUICKSTART.md
+FEATURES.md
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userprefs
+*.swp
+*~
+
+# Build results
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# Logs
+**/logs/
+*.log
+
+# Databases
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+**/tmp/
+**/temp/
+

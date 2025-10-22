@@ -1,0 +1,62 @@
+# Next.js UI Dockerfile
+# Multi-stage build için optimize edilmiş
+
+# Dependencies Stage
+FROM node:20-alpine AS deps
+WORKDIR /app
+
+# Dependency files kopyala
+COPY package.json package-lock.json* ./
+
+# Dependencies yükle
+RUN npm ci --legacy-peer-deps
+
+# Builder Stage
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Dependencies'i kopyala
+COPY --from=deps /app/node_modules ./node_modules
+
+# Kaynak kodları kopyala
+COPY . .
+
+# Build argument
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+# Next.js telemetry'yi kapat
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build
+RUN npm run build
+
+# Runner Stage
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+# Production environment
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Güvenlik için non-root user oluştur
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Build output'u kopyala
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+# User değiştir
+USER nextjs
+
+# Port aç
+EXPOSE 3000
+
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Uygulamayı başlat
+CMD ["node", "server.js"]
+

@@ -1,0 +1,71 @@
+# Build results
+**/bin/
+**/obj/
+**/out/
+**/publish/
+**/TestResults/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Visual Studio
+.vs/
+.vscode/
+*.code-workspace
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Rider
+.idea/
+*.sln.iml
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+**/Properties/launchSettings.json
+
+# Logs
+**/logs/
+*.log
+
+# Database
+*.db
+*.sqlite
+*.db-shm
+*.db-wal
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+README.md
+QUICKSTART.md
+API_ENDPOINTS.md
+
+# DevOps
+../devops/
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+# Migrations (opsiyonel - ihtiyaca göre)
+# **/Migrations/
+

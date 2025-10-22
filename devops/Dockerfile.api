@@ -1,0 +1,54 @@
+# .NET API Dockerfile
+# Multi-stage build için optimize edilmiş
+
+# Build Stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+# Proje dosyalarını kopyala ve restore et
+COPY ["DBIntegrationHub.Presentation/DBIntegrationHub.Presentation.csproj", "DBIntegrationHub.Presentation/"]
+COPY ["DBIntegrationHub.Application/DBIntegrationHub.Application.csproj", "DBIntegrationHub.Application/"]
+COPY ["DBIntegrationHub.Domain/DBIntegrationHub.Domain.csproj", "DBIntegrationHub.Domain/"]
+COPY ["DBIntegrationHub.Infrastructure/DBIntegrationHub.Infrastructure.csproj", "DBIntegrationHub.Infrastructure/"]
+
+# Restore dependencies
+RUN dotnet restore "DBIntegrationHub.Presentation/DBIntegrationHub.Presentation.csproj"
+
+# Tüm kaynak kodları kopyala
+COPY . .
+
+# Build
+WORKDIR "/src/DBIntegrationHub.Presentation"
+RUN dotnet build "DBIntegrationHub.Presentation.csproj" -c Release -o /app/build
+
+# Publish Stage
+FROM build AS publish
+RUN dotnet publish "DBIntegrationHub.Presentation.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# Runtime Stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+WORKDIR /app
+
+# Güvenlik için non-root user oluştur
+RUN addgroup --system --gid 1001 appgroup && \
+    adduser --system --uid 1001 --ingroup appgroup appuser
+
+# Log dizini oluştur
+RUN mkdir -p /app/logs && chown -R appuser:appgroup /app
+
+# Publish edilmiş dosyaları kopyala
+COPY --from=publish /app/publish .
+
+# User değiştir
+USER appuser
+
+# Port aç
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost/health || exit 1
+
+# Uygulamayı başlat
+ENTRYPOINT ["dotnet", "DBIntegrationHub.Presentation.dll"]
+

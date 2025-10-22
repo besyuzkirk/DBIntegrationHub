@@ -1,0 +1,6 @@
+@DBIntegrationHub.Presentation_HostAddress = http://localhost:0
+
+GET {{DBIntegrationHub.Presentation_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
