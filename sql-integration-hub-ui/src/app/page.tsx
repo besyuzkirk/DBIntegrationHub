@@ -10,11 +10,19 @@ export default function Home() {
   const isAuthenticated = useStore((state) => state.isAuthenticated);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/dashboard');
-    } else {
-      router.push('/login');
-    }
+    // Store'dan authentication durumunu kontrol et
+    const checkAuth = () => {
+      if (isAuthenticated) {
+        router.push('/dashboard');
+      } else {
+        router.push('/login');
+      }
+    };
+
+    // Kısa bir gecikme ile kontrol et (store rehydration için)
+    const timeoutId = setTimeout(checkAuth, 100);
+    
+    return () => clearTimeout(timeoutId);
   }, [isAuthenticated, router]);
 
   return (

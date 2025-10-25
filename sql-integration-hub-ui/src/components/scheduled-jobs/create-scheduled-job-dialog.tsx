@@ -35,7 +35,7 @@ export function CreateScheduledJobDialog({
   preSelectedIntegrationId,
 }: CreateScheduledJobDialogProps) {
   const { createScheduledJob } = useScheduledJobs();
-  const { integrations } = useIntegrations();
+  const { data: integrations } = useIntegrations();
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -52,8 +52,8 @@ export function CreateScheduledJobDialog({
   const groupNames = Array.from(
     new Set(
       integrations
-        ?.filter((i) => i.groupName)
-        .map((i) => i.groupName)
+        ?.filter((i: any) => i.groupName)
+        .map((i: any) => i.groupName)
     )
   );
 
@@ -150,7 +150,7 @@ export function CreateScheduledJobDialog({
                   <SelectValue placeholder="Integration seçin" />
                 </SelectTrigger>
                 <SelectContent>
-                  {integrations?.map((integration) => (
+                  {integrations?.map((integration: any) => (
                     <SelectItem key={integration.id} value={integration.id}>
                       {integration.name}
                     </SelectItem>
@@ -172,8 +172,8 @@ export function CreateScheduledJobDialog({
                   <SelectValue placeholder="Grup seçin" />
                 </SelectTrigger>
                 <SelectContent>
-                  {groupNames.map((groupName) => (
-                    <SelectItem key={groupName} value={groupName!}>
+                  {groupNames.map((groupName: any) => (
+                    <SelectItem key={groupName} value={groupName}>
                       {groupName}
                     </SelectItem>
                   ))}

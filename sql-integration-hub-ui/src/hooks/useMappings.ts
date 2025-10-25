@@ -9,6 +9,11 @@ export interface Mapping {
   targetParameter: string;
 }
 
+export interface ColumnMapping {
+  sourceColumn: string;
+  targetParameter: string;
+}
+
 export interface SaveMappingsRequest {
   integrationId: string;
   mappings: { sourceColumn: string; targetParameter: string }[];

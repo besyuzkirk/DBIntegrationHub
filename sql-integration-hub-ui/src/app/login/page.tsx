@@ -17,10 +17,11 @@ export default function LoginPage() {
 
   // Eğer zaten giriş yapmışsa dashboard'a yönlendir
   useEffect(() => {
-    if (isAuthenticated) {
+    // Sadece gerçekten authenticate ise yönlendir
+    if (isAuthenticated && !isLoggingIn) {
       router.push('/dashboard');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isLoggingIn, router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

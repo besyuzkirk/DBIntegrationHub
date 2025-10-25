@@ -124,7 +124,7 @@ export function MappingCanvas({ mappings, onRemoveMapping, onDrop }: MappingCanv
                     <div>
                       <p className="text-xs text-muted-foreground font-light">Source</p>
                       <p className="text-sm font-normal text-foreground truncate">
-                        {mapping.source_column}
+                        {mapping.sourceColumn}
                       </p>
                     </div>
                   </div>
@@ -141,7 +141,7 @@ export function MappingCanvas({ mappings, onRemoveMapping, onDrop }: MappingCanv
                     <div>
                       <p className="text-xs text-muted-foreground font-light">Target</p>
                       <p className="text-sm font-normal text-foreground truncate">
-                        {mapping.target_parameter}
+                        {mapping.targetParameter}
                       </p>
                     </div>
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />

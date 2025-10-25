@@ -18,9 +18,16 @@ export default function DashboardLayout({
 
   useEffect(() => {
     // Eğer authenticate değilse login sayfasına yönlendir
-    if (!isAuthenticated || !token) {
-      router.push('/login');
-    }
+    // Kısa bir gecikme ile kontrol et (store rehydration için)
+    const checkAuth = () => {
+      if (!isAuthenticated || !token) {
+        router.push('/login');
+      }
+    };
+
+    const timeoutId = setTimeout(checkAuth, 100);
+    
+    return () => clearTimeout(timeoutId);
   }, [isAuthenticated, token, router]);
 
   // Auth kontrolü yapılırken loading göster

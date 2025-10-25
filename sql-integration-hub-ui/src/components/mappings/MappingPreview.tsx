@@ -46,9 +46,9 @@ export function MappingPreview({ mappings }: MappingPreviewProps) {
                     key={index}
                     className="flex items-center gap-2 p-2 rounded-lg bg-muted/30 text-xs font-light"
                   >
-                    <span className="flex-1 truncate">{mapping.source_column}</span>
+                    <span className="flex-1 truncate">{mapping.sourceColumn}</span>
                     <ArrowRight className="w-3 h-3 text-primary" />
-                    <span className="flex-1 truncate text-right">{mapping.target_parameter}</span>
+                    <span className="flex-1 truncate text-right">{mapping.targetParameter}</span>
                   </div>
                 ))
               )}

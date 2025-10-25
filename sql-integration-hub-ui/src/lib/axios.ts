@@ -3,6 +3,13 @@ import axios from 'axios';
 // API base URL - ortam değişkeninden al veya default kullan
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5149/api';
 
+// Store'u temizlemek için global bir fonksiyon
+let clearAuthStore: (() => void) | null = null;
+
+export const setClearAuthStore = (fn: () => void) => {
+  clearAuthStore = fn;
+};
+
 // Axios instance oluştur
 export const apiClient = axios.create({
   baseURL,
@@ -38,8 +45,13 @@ apiClient.interceptors.response.use(
       // Token'ı temizle
       localStorage.removeItem('token');
       
-      // Login sayfasına yönlendir (sadece browser'daysa)
+      // Store'u temizle (sadece browser'daysa)
       if (typeof window !== 'undefined') {
+        // Store'u temizle
+        if (clearAuthStore) {
+          clearAuthStore();
+        }
+        // Login sayfasına yönlendir
         window.location.href = '/login';
       }
     }

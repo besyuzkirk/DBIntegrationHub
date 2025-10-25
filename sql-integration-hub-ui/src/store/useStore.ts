@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { setClearAuthStore } from '@/lib/axios';
 
 export interface User {
   id: string;
@@ -50,6 +51,16 @@ export const useStore = create<AuthState>()(
       }),
       {
         name: 'auth-storage', // localStorage key
+        // Store'dan yüklendiğinde token varsa isAuthenticated'ı true yap
+        onRehydrateStorage: () => (state, set: any) => {
+          if (state?.token) {
+            state.isAuthenticated = true;
+          }
+          // Axios interceptor için logout fonksiyonunu ayarla
+          setClearAuthStore(() => {
+            set({ user: null, token: null, isAuthenticated: false }, false, 'axios-logout');
+          });
+        },
       }
     )
   )

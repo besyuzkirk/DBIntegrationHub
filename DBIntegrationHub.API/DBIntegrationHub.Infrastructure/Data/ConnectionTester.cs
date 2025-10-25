@@ -1,6 +1,8 @@
 using DBIntegrationHub.Application.Abstractions.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using MySqlConnector;
 using Npgsql;
 using System.Data.Common;
@@ -26,28 +28,35 @@ public class ConnectionTester : IConnectionTester
 
         try
         {
-            DbConnection connection = databaseType.ToLower() switch
+            if (databaseType.ToLower() == "mongodb")
             {
-                "postgresql" => new NpgsqlConnection(connectionString),
-                "mysql" => new MySqlConnection(connectionString),
-                "sqlserver" => new SqlConnection(connectionString),
-                _ => throw new NotSupportedException($"Desteklenmeyen veritabanı tipi: {databaseType}")
-            };
-
-            await using (connection)
+                return await TestMongoDBConnectionAsync(connectionString, stopwatch, cancellationToken);
+            }
+            else
             {
-                await connection.OpenAsync(cancellationToken);
-                stopwatch.Stop();
+                DbConnection connection = databaseType.ToLower() switch
+                {
+                    "postgresql" => new NpgsqlConnection(connectionString),
+                    "mysql" => new MySqlConnection(connectionString),
+                    "sqlserver" => new SqlConnection(connectionString),
+                    _ => throw new NotSupportedException($"Desteklenmeyen veritabanı tipi: {databaseType}")
+                };
 
-                _logger.LogInformation(
-                    "Bağlantı testi başarılı - Tip: {DatabaseType}, Süre: {Duration}ms",
-                    databaseType,
-                    stopwatch.ElapsedMilliseconds);
+                await using (connection)
+                {
+                    await connection.OpenAsync(cancellationToken);
+                    stopwatch.Stop();
 
-                return new ConnectionTestResult(
-                    true,
-                    "Bağlantı başarılı",
-                    (int)stopwatch.ElapsedMilliseconds);
+                    _logger.LogInformation(
+                        "Bağlantı testi başarılı - Tip: {DatabaseType}, Süre: {Duration}ms",
+                        databaseType,
+                        stopwatch.ElapsedMilliseconds);
+
+                    return new ConnectionTestResult(
+                        true,
+                        "Bağlantı başarılı",
+                        (int)stopwatch.ElapsedMilliseconds);
+                }
             }
         }
         catch (Exception ex)
@@ -62,6 +71,45 @@ public class ConnectionTester : IConnectionTester
             return new ConnectionTestResult(
                 false,
                 $"Bağlantı başarısız: {ex.Message}");
+        }
+    }
+
+    private async Task<ConnectionTestResult> TestMongoDBConnectionAsync(
+        string connectionString, 
+        Stopwatch stopwatch, 
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var client = new MongoClient(connectionString);
+            
+            // Ping test
+            await client.GetDatabase("admin").RunCommandAsync<BsonDocument>(
+                new BsonDocument("ping", 1), 
+                cancellationToken: cancellationToken);
+            
+            stopwatch.Stop();
+
+            _logger.LogInformation(
+                "MongoDB bağlantı testi başarılı - Süre: {Duration}ms",
+                stopwatch.ElapsedMilliseconds);
+
+            return new ConnectionTestResult(
+                true,
+                "MongoDB bağlantısı başarılı",
+                (int)stopwatch.ElapsedMilliseconds);
+        }
+        catch (Exception ex)
+        {
+            stopwatch.Stop();
+
+            _logger.LogError(
+                ex,
+                "MongoDB bağlantı testi başarısız");
+
+            return new ConnectionTestResult(
+                false,
+                $"MongoDB bağlantısı başarısız: {ex.Message}");
         }
     }
 }
