@@ -4,6 +4,8 @@ using DBIntegrationHub.Application.Connections.Commands.PreviewQuery;
 using DBIntegrationHub.Application.Connections.Commands.TestConnection;
 using DBIntegrationHub.Application.Connections.Queries.GetAllConnections;
 using DBIntegrationHub.Application.Connections.Queries.GetConnectionById;
+using DBIntegrationHub.Application.Connections.Queries.GetConnectionSchema;
+using DBIntegrationHub.Application.Connections.Queries.GetTableColumns;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -107,6 +109,43 @@ public class ConnectionsController : ApiController
 
         return Ok(result.Value);
     }
+
+    /// <summary>
+    /// Veritabanı bağlantısının schema bilgilerini getirir (tablolar ve kolonlar)
+    /// </summary>
+        [HttpGet("{id:guid}/schema")]
+        public async Task<IActionResult> GetSchema(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            var query = new GetConnectionSchemaQuery(id);
+            var result = await Sender.Send(query, cancellationToken);
+
+            if (result.IsFailure)
+            {
+                return BadRequest(new { error = result.Error });
+            }
+
+            return Ok(result.Value);
+        }
+
+        [HttpGet("{id:guid}/schema/{tableName}/columns")]
+        public async Task<IActionResult> GetTableColumns(
+            Guid id,
+            string tableName,
+            string schema = "dbo",
+            CancellationToken cancellationToken = default)
+        {
+            var query = new GetTableColumnsQuery(id, tableName, schema);
+            var result = await Sender.Send(query, cancellationToken);
+
+            if (result.IsFailure)
+            {
+                return BadRequest(new { error = result.Error });
+            }
+
+            return Ok(result.Value);
+        }
 
     /// <summary>
     /// Veritabanı bağlantısını siler

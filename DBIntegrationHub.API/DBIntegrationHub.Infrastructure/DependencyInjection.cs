@@ -56,6 +56,7 @@ public static class DependencyInjection
         services.AddScoped<IQueryPreviewService, QueryPreviewService>();
         services.AddScoped<IIntegrationRunner, IntegrationRunner>();
         services.AddScoped<ITypeMapper, TypeMapperService>();
+        services.AddScoped<ISchemaService, SchemaService>();
 
         // Caching - Memory Cache için
         services.AddDistributedMemoryCache();

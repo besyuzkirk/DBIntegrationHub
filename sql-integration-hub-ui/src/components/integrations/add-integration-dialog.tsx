@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -34,6 +35,14 @@ import {
 import { Plus, Eye, Loader2 } from 'lucide-react';
 import { useConnections } from '@/hooks/useConnections';
 import { useCreateIntegration, usePreviewQuery, QueryPreviewResult } from '@/hooks/useIntegrations';
+import { VisualQueryBuilder } from './VisualQueryBuilder';
+
+// Connection tipini tanımla
+interface Connection {
+  id: string;
+  name: string;
+  databaseType: string;
+}
 
 interface FormData {
   name: string;
@@ -117,8 +126,9 @@ export function AddIntegrationDialog() {
         </DialogHeader>
 
         <Tabs defaultValue="form" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="form">Form</TabsTrigger>
+            <TabsTrigger value="visual">Visual Builder</TabsTrigger>
             <TabsTrigger value="preview">Preview</TabsTrigger>
           </TabsList>
 
@@ -144,7 +154,7 @@ export function AddIntegrationDialog() {
                 <Label htmlFor="sourceConnectionId">Kaynak Bağlantı</Label>
                 <Select
                   value={sourceConnectionId}
-                  onValueChange={(value) => setValue('sourceConnectionId', value)}
+                  onValueChange={(value: string) => setValue('sourceConnectionId', value)}
                 >
                   <SelectTrigger id="sourceConnectionId">
                     <SelectValue placeholder="Kaynak bağlantı seçin" />
@@ -159,7 +169,7 @@ export function AddIntegrationDialog() {
                         Bağlantı bulunamadı
                       </SelectItem>
                     ) : (
-                      connections?.map((conn) => (
+                      connections?.map((conn: Connection) => (
                         <SelectItem key={conn.id} value={conn.id}>
                           {conn.name} ({conn.databaseType})
                         </SelectItem>
@@ -222,7 +232,7 @@ export function AddIntegrationDialog() {
                 <Label htmlFor="targetConnectionId">Hedef Bağlantı</Label>
                 <Select
                   value={targetConnectionId}
-                  onValueChange={(value) => setValue('targetConnectionId', value)}
+                  onValueChange={(value: string) => setValue('targetConnectionId', value)}
                 >
                   <SelectTrigger id="targetConnectionId">
                     <SelectValue placeholder="Hedef bağlantı seçin" />
@@ -237,7 +247,7 @@ export function AddIntegrationDialog() {
                         Bağlantı bulunamadı
                       </SelectItem>
                     ) : (
-                      connections?.map((conn) => (
+                      connections?.map((conn: Connection) => (
                         <SelectItem key={conn.id} value={conn.id}>
                           {conn.name} ({conn.databaseType})
                         </SelectItem>
@@ -318,6 +328,182 @@ export function AddIntegrationDialog() {
                 </Button>
               </DialogFooter>
             </form>
+          </TabsContent>
+
+          <TabsContent value="visual" className="mt-4">
+            <div className="space-y-6">
+              {/* Basic Info */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Integration Bilgileri</CardTitle>
+                  <CardDescription>
+                    Temel integration bilgilerini girin
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Name */}
+                  <div className="space-y-2">
+                    <Label htmlFor="visual-name">Integration Adı</Label>
+                    <Input
+                      id="visual-name"
+                      placeholder="Örn: User Data Sync"
+                      {...register('name', {
+                        required: 'Integration adı gereklidir',
+                      })}
+                    />
+                    {errors.name && (
+                      <p className="text-sm text-red-500">{errors.name.message}</p>
+                    )}
+                  </div>
+
+                  {/* Source Connection */}
+                  <div className="space-y-2">
+                    <Label htmlFor="visual-sourceConnectionId">Kaynak Bağlantı</Label>
+                    <Select
+                      value={sourceConnectionId}
+                      onValueChange={(value: string) => setValue('sourceConnectionId', value)}
+                    >
+                      <SelectTrigger id="visual-sourceConnectionId">
+                        <SelectValue placeholder="Kaynak bağlantı seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {connectionsLoading ? (
+                          <SelectItem value="loading" disabled>
+                            Yükleniyor...
+                          </SelectItem>
+                        ) : connections?.length === 0 ? (
+                          <SelectItem value="empty" disabled>
+                            Bağlantı bulunamadı
+                          </SelectItem>
+                        ) : (
+                          connections?.map((conn: any) => (
+                            <SelectItem key={conn.id} value={conn.id}>
+                              {conn.name} ({conn.databaseType})
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    {errors.sourceConnectionId && (
+                      <p className="text-sm text-red-500">
+                        {errors.sourceConnectionId.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Target Connection */}
+                  <div className="space-y-2">
+                    <Label htmlFor="visual-targetConnectionId">Hedef Bağlantı</Label>
+                    <Select
+                      value={targetConnectionId}
+                      onValueChange={(value: string) => setValue('targetConnectionId', value)}
+                    >
+                      <SelectTrigger id="visual-targetConnectionId">
+                        <SelectValue placeholder="Hedef bağlantı seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {connectionsLoading ? (
+                          <SelectItem value="loading" disabled>
+                            Yükleniyor...
+                          </SelectItem>
+                        ) : connections?.length === 0 ? (
+                          <SelectItem value="empty" disabled>
+                            Bağlantı bulunamadı
+                          </SelectItem>
+                        ) : (
+                          connections?.map((conn: any) => (
+                            <SelectItem key={conn.id} value={conn.id}>
+                              {conn.name} ({conn.databaseType})
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    {errors.targetConnectionId && (
+                      <p className="text-sm text-red-500">
+                        {errors.targetConnectionId.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Group Name and Execution Order */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="visual-groupName">Grup Adı (Opsiyonel)</Label>
+                      <Input
+                        id="visual-groupName"
+                        placeholder="Örn: Daily Sync"
+                        {...register('groupName')}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="visual-executionOrder">Çalışma Sırası</Label>
+                      <Input
+                        id="visual-executionOrder"
+                        type="number"
+                        {...register('executionOrder', { valueAsNumber: true })}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Visual Query Builder */}
+              <VisualQueryBuilder
+                connectionId={sourceConnectionId}
+                onQueryChange={(query) => setValue('sourceQuery', query)}
+                initialQuery={sourceQuery}
+              />
+
+              {/* Target Query */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Hedef Sorgu (INSERT/UPDATE)</CardTitle>
+                  <CardDescription>
+                    Kaynak verilerin hedef veritabanına nasıl yazılacağını belirleyin
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    placeholder="INSERT INTO target_users (id, name, email) VALUES (@Id, @Name, @Email)"
+                    rows={4}
+                    className="font-mono text-sm"
+                    {...register('targetQuery', {
+                      required: 'Hedef sorgu gereklidir',
+                      pattern: {
+                        value: /\b(INSERT|UPDATE)\b/i,
+                        message: 'Sorgu INSERT veya UPDATE içermelidir',
+                      },
+                    })}
+                  />
+                  {errors.targetQuery && (
+                    <p className="text-sm text-red-500 mt-2">
+                      {errors.targetQuery.message}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    reset();
+                    setPreviewData(null);
+                    setOpen(false);
+                  }}
+                >
+                  İptal
+                </Button>
+                <Button 
+                  onClick={handleSubmit(onSubmit)} 
+                  disabled={createIntegration.isPending}
+                >
+                  {createIntegration.isPending ? 'Oluşturuluyor...' : 'Oluştur'}
+                </Button>
+              </DialogFooter>
+            </div>
           </TabsContent>
 
           <TabsContent value="preview" className="mt-4">
